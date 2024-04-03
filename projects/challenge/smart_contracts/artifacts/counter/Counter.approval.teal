@@ -1,0 +1,141 @@
+#pragma version 10
+
+smart_contracts.counter.contract.Counter.approval_program:
+    txn ApplicationID
+    bnz main_entrypoint@2
+    callsub __init__
+
+main_entrypoint@2:
+    // smart_contracts/counter/contract.py:24
+    // class Counter(ARC4Contract):
+    txn NumAppArgs
+    bz main_bare_routing@7
+    method "increment()uint64"
+    txna ApplicationArgs 0
+    match main_increment_route@4
+    err // reject transaction
+
+main_increment_route@4:
+    // smart_contracts/counter/contract.py:35
+    // @arc4.abimethod()
+    txn OnCompletion
+    !
+    assert // OnCompletion is NoOp
+    txn ApplicationID
+    assert // is not creating
+    callsub increment
+    byte 0x151f7c75
+    swap
+    concat
+    log
+    int 1
+    return
+
+main_bare_routing@7:
+    // smart_contracts/counter/contract.py:24
+    // class Counter(ARC4Contract):
+    txn OnCompletion
+    switch main_create@8 main_opt_in@9
+    err // reject transaction
+
+main_create@8:
+    // smart_contracts/counter/contract.py:24
+    // class Counter(ARC4Contract):
+    txn ApplicationID
+    !
+    assert // is creating
+    int 1
+    return
+
+main_opt_in@9:
+    // smart_contracts/counter/contract.py:30
+    // @arc4.baremethod(allow_actions=["OptIn"])
+    txn ApplicationID
+    assert // is not creating
+    // smart_contracts/counter/contract.py:30-31
+    // @arc4.baremethod(allow_actions=["OptIn"])
+    // def opt_in(self) -> None:
+    callsub opt_in
+    int 1
+    return
+
+
+// smart_contracts.counter.contract.Counter.increment() -> bytes:
+increment:
+    // smart_contracts/counter/contract.py:35-36
+    // @arc4.abimethod()
+    // def increment(self) -> arc4.UInt64:
+    proto 0 1
+    // smart_contracts/counter/contract.py:37
+    // assert Txn.sender.is_opted_in(
+    txn Sender
+    // smart_contracts/counter/contract.py:38
+    // Global.current_application_id
+    global CurrentApplicationID
+    // smart_contracts/counter/contract.py:37-39
+    // assert Txn.sender.is_opted_in(
+    //     Global.current_application_id
+    // ), "Sender must opt-in to the contract"
+    app_opted_in
+    assert // Sender must opt-in to the contract
+    // smart_contracts/counter/contract.py:40
+    // self.count[Txn.sender] += 1
+    txn Sender
+    int 0
+    byte "count"
+    app_local_get_ex
+    assert // check count exists for account
+    int 1
+    +
+    txn Sender
+    byte "count"
+    uncover 2
+    app_local_put
+    // smart_contracts/counter/contract.py:41
+    // return arc4.UInt64(self.count[Txn.sender])
+    txn Sender
+    int 0
+    byte "count"
+    app_local_get_ex
+    assert // check count exists for account
+    itob
+    retsub
+
+
+// smart_contracts.counter.contract.Counter.opt_in() -> void:
+opt_in:
+    // smart_contracts/counter/contract.py:30-31
+    // @arc4.baremethod(allow_actions=["OptIn"])
+    // def opt_in(self) -> None:
+    proto 0 0
+    // smart_contracts/counter/contract.py:32
+    // self.count[Txn.sender] = UInt64(0)
+    txn Sender
+    byte "count"
+    int 0
+    app_local_put
+    // smart_contracts/counter/contract.py:33
+    // self.counter.value += 1
+    int 0
+    byte "counter"
+    app_global_get_ex
+    assert // check counter exists
+    int 1
+    +
+    byte "counter"
+    swap
+    app_global_put
+    retsub
+
+
+// smart_contracts.counter.contract.Counter.__init__() -> void:
+__init__:
+    // smart_contracts/counter/contract.py:26
+    // def __init__(self) -> None:
+    proto 0 0
+    // smart_contracts/counter/contract.py:28
+    // self.counter = GlobalState(UInt64(0))
+    byte "counter"
+    int 0
+    app_global_put
+    retsub

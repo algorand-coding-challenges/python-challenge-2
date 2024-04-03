@@ -1,0 +1,7 @@
+#pragma version 10
+
+smart_contracts.counter.contract.Counter.clear_state_program:
+    // smart_contracts/counter/contract.py:24
+    // class Counter(ARC4Contract):
+    int 1
+    return
