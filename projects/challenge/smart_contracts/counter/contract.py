@@ -3,9 +3,12 @@ from algopy import ARC4Contract, LocalState, GlobalState, UInt64, Txn, arc4, Glo
 
 
 class Counter(ARC4Contract):
-
-    count: LocalState[UInt64]
-    counters: GlobalState[UInt64]
+ 
+    def __init__(self) -> None:
+        # Initialize the local state for storing individual counts with a key
+        self.count = LocalState(UInt64)
+        # Initialize the global state for storing the total count of participants with a key
+        self.counters = GlobalState(UInt64(0))
 
     @arc4.baremethod(allow_actions=["OptIn"])
     def opt_in(self) -> None:
