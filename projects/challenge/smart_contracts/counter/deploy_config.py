@@ -53,4 +53,4 @@ def deploy(
         logger.info(f"Incremented by 1 and now the count is {response.return_value}")
 
     response = app_client.get_global_state()
-    logger.info(f"Total # of counters: {response.counter} people")
+    logger.info(f"Total # of counters: {response.counters} people")
