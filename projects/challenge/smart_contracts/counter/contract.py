@@ -4,8 +4,13 @@ from algopy import ARC4Contract, LocalState, GlobalState, UInt64, Txn, arc4, Glo
 
 class Counter(ARC4Contract):
 
-    count: LocalState[UInt64]
-    counters: GlobalState[UInt64]
+    def __init__(self) -> None:
+       self.count = LocalState(UInt64, key = "count", description = "Local of count")
+       self.counters = GlobalState(UInt64(0), key="counters", description="Global counters")
+
+    #count: LocalState[UInt64]
+    #counters: GlobalState[UInt64]
+
 
     @arc4.baremethod(allow_actions=["OptIn"])
     def opt_in(self) -> None:
