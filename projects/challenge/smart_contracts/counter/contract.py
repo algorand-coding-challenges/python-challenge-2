@@ -3,7 +3,10 @@ from algopy import ARC4Contract, LocalState, GlobalState, UInt64, Txn, arc4, Glo
 
 
 class Counter(ARC4Contract):
-
+    def __init__(self) -> None: 
+        self.counters = GlobalState(UInt64(0)) 
+        self.count = LocalState(UInt64) 
+        
     count: LocalState[UInt64]
     counters: GlobalState[UInt64]
 
