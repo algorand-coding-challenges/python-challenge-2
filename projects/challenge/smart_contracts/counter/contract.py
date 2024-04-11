@@ -7,7 +7,6 @@ class Counter(ARC4Contract):
     count: LocalState[UInt64]
     counters: GlobalState[UInt64]
     
-    # Initilising our LocalState 
     def __init__(self) -> None:
         self.count = LocalState(UInt64) # initilising count as localstate with UInt64
         self.counters = GlobalState(UInt64(1)) # initilising counters as globalstate with UInt64
