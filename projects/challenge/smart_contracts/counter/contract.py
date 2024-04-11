@@ -6,6 +6,10 @@ class Counter(ARC4Contract):
 
     count: LocalState[UInt64]
     counters: GlobalState[UInt64]
+    
+    def __init__(self) -> None:
+        self.count = LocalState(UInt64) # initilising count as localstate with UInt64
+        self.counters = GlobalState(UInt64(1)) # initilising counters as globalstate with UInt64
 
     @arc4.baremethod(allow_actions=["OptIn"])
     def opt_in(self) -> None:
@@ -19,3 +23,4 @@ class Counter(ARC4Contract):
         ), "Sender must opt-in to the contract"
         self.count[Txn.sender] += 1
         return arc4.UInt64(self.count[Txn.sender])
+    
