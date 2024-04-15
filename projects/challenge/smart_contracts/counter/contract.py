@@ -1,15 +1,19 @@
 # pyright: reportMissingModuleSource=false
-from algopy import ARC4Contract, LocalState, GlobalState, UInt64, Txn, arc4, Global
+from algopy import ARC4Contract, LocalState, GlobalState, UInt64, Txn, arc4, Global, gtxn, Account
 
 
 class Counter(ARC4Contract):
-
-    count: LocalState[UInt64]
-    counters: GlobalState[UInt64]
+    def __init__(self) -> None:
+        self.counters = GlobalState(UInt64)     # counters key, UInt64 value
+        self.counters.value = UInt64(0)         # init counters value
+    
+    #count: LocalState[UInt64] 
+    #counters: GlobalState[UInt64]
 
     @arc4.baremethod(allow_actions=["OptIn"])
     def opt_in(self) -> None:
-        self.count[Txn.sender] = UInt64(0)
+        self.count = LocalState(UInt64)         # count key, UInt64 value
+        self.count[Txn.sender] = UInt64(0)      # init count value on opt_in
         self.counters.value += 1
 
     @arc4.abimethod()
