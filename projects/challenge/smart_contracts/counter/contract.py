@@ -5,13 +5,13 @@ from algopy import ARC4Contract, LocalState, UInt64, Txn, arc4, Global
 class Counter(ARC4Contract):
 
     def __init__(self) -> None:
-        self.count = LocalState(UInt64)
-        self.counters = UInt64(0)
+        self.count: LocalState[UInt64] = LocalState(UInt64)
+        self.counters: GlobalState[UInt64] = UInt64(0)
 
     @arc4.baremethod(allow_actions=["OptIn"])
     def opt_in(self) -> None:
         self.count[Txn.sender] = UInt64(0)
-        self.counters += 1
+        self.counters.value += 1
 
     @arc4.abimethod()
     def increment(self) -> arc4.UInt64:
