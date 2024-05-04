@@ -6,7 +6,7 @@ class Counter(ARC4Contract):
 
     def __init__(self) -> None:
         self.count: LocalState[UInt64] = LocalState(UInt64)
-        self.counters: GlobalState[UInt64] = GlobalState(UInt64)
+        self.counters: GlobalState[UInt64] = GlobalState(UInt64(0))
 
     @arc4.baremethod(allow_actions=["OptIn"])
     def opt_in(self) -> None:
